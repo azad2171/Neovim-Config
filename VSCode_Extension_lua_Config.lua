@@ -48,7 +48,13 @@ keymap("n", "<leader>l", "<cmd>lua require('vscode').action('workbench.action.ne
 
 -- fold unfold code
 keymap("n", "<leader>f", "<cmd>lua require('vscode').action('editor.fold')<CR>", opts)
+keymap("n", "<leader>fa", "<cmd>lua require('vscode').action('editor.foldAll')<CR>", opts)
 keymap("n", "<leader>u", "<cmd>lua require('vscode').action('editor.unfold')<CR>", opts)
+keymap("n", "<leader>ua", "<cmd>lua require('vscode').action('editor.unfoldAll')<CR>", opts)
+keymap("n", "<leader>f1", "<cmd>lua require('vscode').action('editor.foldLevel1')<CR>", opts)
+keymap("n", "<leader>f2", "<cmd>lua require('vscode').action('editor.foldLevel2')<CR>", opts)
+keymap("n", "<leader>f3", "<cmd>lua require('vscode').action('editor.foldLevel3')<CR>", opts)
+keymap("n", "<leader>f4", "<cmd>lua require('vscode').action('editor.foldLevel4')<CR>", opts)
 
 
 
@@ -96,4 +102,12 @@ keymap("n", "<leader>k", "<cmd>lua require('vscode').action('workbench.action.fo
 -- Focus right editor group
 -- keymap("n", "<leader>1", "<cmd>lua require('vscode' ).action('workbench.action. focusRightGroup')<CR>",opts)
 
+keymap("n", "<leader>e", "<cmd>lua require('vscode').action('workbench.view.explorer')<CR>", opts)
+keymap("n", "<leader>x", "<cmd>lua require('vscode').action('workbench.action.closeActiveEditor')<CR>", opts)
 
+-- Surround seleceted text with quotes, brackets, or braces
+keymap("v", '"', 'c"<C-r>""<Esc>', opts)
+keymap("v", "'", "c'<C-r>\"'<Esc>", opts)
+keymap("v", "(", "c(<C-r>\")<Esc>", opts)
+keymap("v", "[", "c[<C-r>\"]<Esc>", opts)
+keymap("v", "{", "c{<C-r>\"}<Esc>", opts)
