@@ -49,6 +49,25 @@ vim.keymap.set('n', '<leader>mr', ':!./build/app<CR>', { desc = 'Run executable'
 -- Clean, Build and Run
 vim.keymap.set('n', '<leader>ma', ':!make clean && make && ./build/app<CR>', { desc = 'Clean, Build & Run', silent = true })
 
+-- For conciseness
+local opts = { noremap = true, silent = true }
+
+-- move text up and down
+vim.keymap.set('n', 'J', ':m .+1<CR>==', opts)
+vim.keymap.set('n', 'K', ':m .-2<CR>==', opts)
+
+vim.keymap.set('v', 'J', ":m '>+1<CR>gv=gv", opts)
+vim.keymap.set('v', 'K', ":m '<-2<CR>gv=gv", opts)
+
+vim.keymap.set({ 'n', 'v' }, 'L', '$', opts)
+vim.keymap.set({ 'n', 'v' }, 'H', '^', opts)
+
+vim.keymap.set('v', '"', 'c"<C-r>""<Esc>', opts)
+vim.keymap.set('v', "'", "c'<C-r>\"'<Esc>", opts)
+vim.keymap.set('v', '(', 'c(<C-r>")<Esc>', opts)
+vim.keymap.set('v', '[', 'c[<C-r>"]<Esc>', opts)
+vim.keymap.set('v', '{', 'c{<C-r>"}<Esc>', opts)
+
 ------------------------------------------- above this is my setup -------------------------------------------
 --
 -- Close terminal with Alt-h or Alt-v from terminal mode
@@ -57,9 +76,6 @@ vim.keymap.set('t', '<A-v>', [[<C-\><C-n>:q<CR>]], { desc = 'Close terminal (ver
 
 -- Disable the spacebar key's default behavior in Normal and Visual modes
 vim.keymap.set({ 'n', 'v' }, '<Space>', '<Nop>', { silent = true })
-
--- For conciseness
-local opts = { noremap = true, silent = true }
 
 -- save file
 vim.keymap.set('n', '<C-s>', '<cmd> w <CR>', opts)
@@ -90,7 +106,7 @@ vim.keymap.set('n', '<Right>', ':vertical resize +2<CR>', opts)
 -- Buffers
 vim.keymap.set('n', '<Tab>', ':bnext<CR>', opts)
 vim.keymap.set('n', '<S-Tab>', ':bprevious<CR>', opts)
-vim.keymap.set('n', '<leader>x', ':bdelete!<CR>', opts) -- close buffer
+vim.keymap.set('n', '<leader>x', ':close<CR>', opts) -- close buffer
 vim.keymap.set('n', '<leader>b', '<cmd> enew <CR>', opts) -- new buffer
 
 -- Window management
