@@ -2,28 +2,47 @@
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
-local term_buf = nil
-local term_win = nil
+-- Helper: choose command (avoid nesting tmux if already inside tmux)
+local function tmux_cmd(name)
+  if os.getenv 'TMUX' then
+    -- already inside tmux; just use your shell to avoid nesting
+    return vim.o.shell
+  else
+    return string.format('tmux new-session -A -s %s', name)
+  end
+end
+
+-- ===== Horizontal terminal (Alt-h) =====
+local term_buf_h, term_win_h
 
 vim.keymap.set('n', '<A-h>', function()
-  -- If terminal is open, close it
-  if term_win and vim.api.nvim_win_is_valid(term_win) then
-    vim.api.nvim_win_close(term_win, true)
-    term_win = nil
+  -- If window is open, close it (buffer stays alive)
+  if term_win_h and vim.api.nvim_win_is_valid(term_win_h) then
+    vim.api.nvim_win_close(term_win_h, true)
+    term_win_h = nil
     return
   end
 
-  -- Otherwise, open a horizontal split with terminal
+  -- Open a horizontal split
   vim.cmd 'belowright split'
-  term_win = vim.api.nvim_get_current_win()
-  term_buf = vim.api.nvim_create_buf(false, true)
-  vim.api.nvim_win_set_buf(term_win, term_buf)
-  vim.fn.termopen(vim.o.shell)
-  vim.cmd 'startinsert'
-end, { desc = 'Toggle horizontal terminal' })
+  term_win_h = vim.api.nvim_get_current_win()
 
-local term_buf_v = nil
-local term_win_v = nil
+  -- Create the buffer once and keep it hidden when the window closes
+  if not term_buf_h or not vim.api.nvim_buf_is_valid(term_buf_h) then
+    term_buf_h = vim.api.nvim_create_buf(false, true) -- unlisted, scratch
+    vim.api.nvim_buf_set_option(term_buf_h, 'bufhidden', 'hide')
+    vim.api.nvim_win_set_buf(term_win_h, term_buf_h) -- put it in the window
+    vim.fn.termopen(tmux_cmd 'nvim_h') -- start tmux in THIS buffer
+  else
+    -- Reuse existing terminal buffer
+    vim.api.nvim_win_set_buf(term_win_h, term_buf_h)
+  end
+
+  vim.cmd 'startinsert'
+end, { desc = 'Toggle horizontal terminal (tmux nvim_h)' })
+
+-- ===== Vertical terminal (Alt-v) =====
+local term_buf_v, term_win_v
 
 vim.keymap.set('n', '<A-v>', function()
   if term_win_v and vim.api.nvim_win_is_valid(term_win_v) then
@@ -34,11 +53,18 @@ vim.keymap.set('n', '<A-v>', function()
 
   vim.cmd 'vsplit'
   term_win_v = vim.api.nvim_get_current_win()
-  term_buf_v = vim.api.nvim_create_buf(false, true)
-  vim.api.nvim_win_set_buf(term_win_v, term_buf_v)
-  vim.fn.termopen(vim.o.shell)
+
+  if not term_buf_v or not vim.api.nvim_buf_is_valid(term_buf_v) then
+    term_buf_v = vim.api.nvim_create_buf(false, true)
+    vim.api.nvim_buf_set_option(term_buf_v, 'bufhidden', 'hide')
+    vim.api.nvim_win_set_buf(term_win_v, term_buf_v)
+    vim.fn.termopen(tmux_cmd 'nvim_v')
+  else
+    vim.api.nvim_win_set_buf(term_win_v, term_buf_v)
+  end
+
   vim.cmd 'startinsert'
-end, { desc = 'Toggle vertical terminal' })
+end, { desc = 'Toggle vertical terminal (tmux nvim_v)' })
 
 -- Clean and then build
 vim.keymap.set('n', '<leader>mb', ':!make clean && make<CR>', { desc = 'Clean & Build', silent = true })
@@ -78,10 +104,10 @@ vim.keymap.set('t', '<A-v>', [[<C-\><C-n>:q<CR>]], { desc = 'Close terminal (ver
 vim.keymap.set({ 'n', 'v' }, '<Space>', '<Nop>', { silent = true })
 
 -- save file
-vim.keymap.set('n', '<C-s>', '<cmd> w <CR>', opts)
+vim.keymap.set('n', '<C-s>', '<cmd>noautocmd w <CR>', opts)
 
--- save file without auto-formatting
-vim.keymap.set('n', '<leader>sn', '<cmd>noautocmd w <CR>', opts)
+-- save file with auto-formatting
+vim.keymap.set('n', '<leader>sn', '<cmd> w <CR>', opts)
 
 -- quit file
 vim.keymap.set('n', '<C-q>', '<cmd> q <CR>', opts)
@@ -106,7 +132,8 @@ vim.keymap.set('n', '<Right>', ':vertical resize +2<CR>', opts)
 -- Buffers
 vim.keymap.set('n', '<Tab>', ':bnext<CR>', opts)
 vim.keymap.set('n', '<S-Tab>', ':bprevious<CR>', opts)
-vim.keymap.set('n', '<leader>x', ':close<CR>', opts) -- close buffer
+vim.keymap.set('n', '<leader>x', ':bp | bd #<CR>', opts)
+-- vim.keymap.set('n', '<leader>x', ':q<CR>', opts) -- close buffer
 vim.keymap.set('n', '<leader>b', '<cmd> enew <CR>', opts) -- new buffer
 
 -- Window management
@@ -148,3 +175,19 @@ end, { desc = 'Go to next diagnostic message' })
 
 vim.keymap.set('n', '<leader>d', vim.diagnostic.open_float, { desc = 'Open floating diagnostic message' })
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostics list' })
+
+-- Ctrl+Backspace to delete previous word in insert mode
+vim.keymap.set("i", "<C-H>", "<C-w>", { noremap = true })
+-- Ctrl+V to paste from system clipboard in insert mode
+vim.keymap.set({"i", "n"}, "<C-v>", "<C-r>+", { noremap = true, silent = true })
+
+
+-- -- For init.lua
+vim.g.tmux_navigator_no_mappings = 1
+
+vim.keymap.set('n', '<C-h>', ':TmuxNavigateLeft<CR>', { silent = true })
+vim.keymap.set('n', '<C-j>', ':TmuxNavigateDown<CR>', { silent = true })
+vim.keymap.set('n', '<C-k>', ':TmuxNavigateUp<CR>', { silent = true })
+vim.keymap.set('n', '<C-l>', ':TmuxNavigateRight<CR>', { silent = true })
+
+

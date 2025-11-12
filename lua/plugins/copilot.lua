@@ -5,8 +5,8 @@ return {
   config = function()
     require('copilot').setup {
       suggestion = {
-        enabled = true,
-        auto_trigger = true, -- suggestions appear automatically
+        enabled = false,
+        auto_trigger = false, -- suggestions appear automatically
         debounce = 75,
         keymap = {
           accept = '<Tab>',
