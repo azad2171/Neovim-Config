@@ -7,13 +7,13 @@ return {
   opts = {},
   keys = {
     -- Built-in commands
-    { '<leader>ce', '<cmd>CopilotChatExplain<cr>', desc = 'Explain code' },
-    { '<leader>cf', '<cmd>CopilotChatFix<cr>', desc = 'Fix code' },
-    { '<leader>cr', '<cmd>CopilotChatRefactor<cr>', desc = 'Refactor code' },
+    { '<leader>ze', '<cmd>CopilotChatExplain<cr>', desc = 'Explain code' },
+    { '<leader>zf', '<cmd>CopilotChatFix<cr>', desc = 'Fix code' },
+    { '<leader>zr', '<cmd>CopilotChatRefactor<cr>', desc = 'Refactor code' },
 
     -- Custom prompt (Normal mode)
     {
-      '<leader>ci',
+      '<leader>zi',
       function()
         local input = vim.fn.input 'Ask Copilot: '
         if input ~= '' then
@@ -26,7 +26,7 @@ return {
 
     -- Custom prompt (Visual mode)
     {
-      '<leader>ci',
+      '<leader>zi',
       function()
         local input = vim.fn.input 'Ask Copilot about selection: '
         if input ~= '' then
@@ -49,7 +49,7 @@ return {
 
     -- Toggle Copilot Chat panel (Normal mode only)
     {
-      '<leader>cc',
+      '<leader>zc',
       function()
         for _, win in ipairs(vim.api.nvim_list_wins()) do
           local buf = vim.api.nvim_win_get_buf(win)
@@ -67,7 +67,7 @@ return {
 
     -- Visual mode: send selection to Copilot
     {
-      '<leader>cc',
+      '<leader>zc',
       function()
         local start_pos = vim.fn.getpos "'<"
         local end_pos = vim.fn.getpos "'>"

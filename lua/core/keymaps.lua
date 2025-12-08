@@ -104,7 +104,7 @@ vim.keymap.set('t', '<A-v>', [[<C-\><C-n>:q<CR>]], { desc = 'Close terminal (ver
 vim.keymap.set({ 'n', 'v' }, '<Space>', '<Nop>', { silent = true })
 
 -- save file
-vim.keymap.set('n', '<C-s>', '<cmd>noautocmd w <CR>', opts)
+vim.keymap.set({'n', 'i'}, '<C-s>', '<cmd>noautocmd w <CR>', opts)
 
 -- save file with auto-formatting
 vim.keymap.set('n', '<leader>sn', '<cmd> w <CR>', opts)

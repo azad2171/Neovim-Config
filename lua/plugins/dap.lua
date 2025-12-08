@@ -50,6 +50,49 @@ return {
       local dap_python = require 'dap-python'
       dap_python.setup '~/.local/share/nvim/mason/packages/debugpy/venv/bin/python'
 
+
+
+      dap.adapters.python = {
+        type = "executable",
+        command = vim.fn.exepath("python"), -- automatically picks your current venv python
+        args = { "-m", "debugpy.adapter" },
+      }
+
+      dap.configurations.python = {
+        {
+          type = "python",
+          request = "launch",
+          name = "Launch file",
+          program = "${file}",
+          cwd = vim.fn.getcwd(),
+          env = { PYTHONPATH = vim.fn.getcwd() },
+
+          pythonPath = function()
+            -- 1st priority: active venv
+            local venv = os.getenv("VIRTUAL_ENV")
+            if venv and #venv > 0 then
+              return venv .. "/bin/python"
+            end
+
+            -- 2nd: project-level .venv or venv folder
+            local cwd = vim.fn.getcwd()
+            if vim.fn.executable(cwd .. "/.venv/bin/python") == 1 then
+              return cwd .. "/.venv/bin/python"
+            elseif vim.fn.executable(cwd .. "/venv/bin/python") == 1 then
+              return cwd .. "/venv/bin/python"
+            end
+
+            -- fallback
+            return vim.fn.exepath("python")
+          end,
+        },
+      }
+
+
+
+
+
+
       local dapui = require 'dapui'
 
       dapui.setup()
@@ -61,12 +104,14 @@ return {
         require('dapui').eval(nil, { enter = true })
       end)
 
+      vim.keymap.set({ 'n', 'i' }, '<F4>', dap.terminate)
       vim.keymap.set({ 'n', 'i' }, '<F5>', dap.continue)
-      vim.keymap.set({ 'n', 'i' }, '<F11>', dap.step_into)
-      vim.keymap.set({ 'n', 'i' }, '<F10>', dap.step_over)
-      vim.keymap.set({ 'n', 'i' }, '<S-F11>', dap.step_out)
+      vim.keymap.set({ 'n', 'i' }, '<F6>', dap.restart)
+      vim.keymap.set({ 'n', 'i' }, '<F7>', dap.run_to_cursor)
       vim.keymap.set({ 'n', 'i' }, '<F9>', dap.step_back)
-      vim.keymap.set({ 'n', 'i' }, '<C-S-F5>', dap.restart)
+      vim.keymap.set({ 'n', 'i' }, '<F10>', dap.step_over)
+      vim.keymap.set({ 'n', 'i' }, '<F11>', dap.step_into)
+      vim.keymap.set({ 'n', 'i' }, '<F12>', dap.step_out)
 
       dap.listeners.before.attach.dapui_config = function()
         dapui.open()
