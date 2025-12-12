@@ -179,7 +179,7 @@ vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagn
 -- Ctrl+Backspace to delete previous word in insert mode
 vim.keymap.set("i", "<C-H>", "<C-w>", { noremap = true })
 -- Ctrl+V to paste from system clipboard in insert mode
-vim.keymap.set({"i", "n"}, "<C-v>", "<C-r>+", { noremap = true, silent = true })
+vim.keymap.set("i", "<C-v>", "<C-r>+", { noremap = true, silent = true })
 
 
 -- -- For init.lua
