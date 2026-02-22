@@ -15,4 +15,3 @@ opt.shiftwidth = 4
 
 -- Number of spaces a <Tab> counts for when expandtab is on
 opt.softtabstop = 4
-vim.o.autochdir = true
